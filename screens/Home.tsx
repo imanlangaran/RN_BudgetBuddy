@@ -42,7 +42,7 @@ const Home = () => {
     const startOfMonthTimestamp = Math.floor(startOfMonth.getTime() / 1000);
     const endOfMonthTimestamp = Math.floor(endOfMonth.getTime() / 1000);
 
-    const transactionsByMonth = await db.getAllAsync<TransactionsByMonth>(`
+    const transactionByMonth = await db.getAllAsync<TransactionsByMonth>(`
       SELECT ifnull(
           SUM(
             CASE
@@ -64,7 +64,7 @@ const Home = () => {
       FROM Transactions
       WHERE date BETWEEN ? AND ?
       `, [startOfMonthTimestamp, endOfMonthTimestamp]);
-    setTransactionsByMonth(transactionsByMonth[0]);
+    setTransactionsByMonth(transactionByMonth[0]);
   }
 
   async function deleteTransaction(id: number) {
@@ -94,7 +94,7 @@ const TransactionSummary = ({
   totalExpenses,
 }: TransactionsByMonth) => {
   const saving = totalIncome - totalExpenses;
-  const readablePerion = new Date().toLocaleDateString("default", {
+  const readablePeriod = new Date().toLocaleDateString("default", {
     month: "long",
     year: "numeric",
   });
@@ -111,7 +111,7 @@ const TransactionSummary = ({
 
   return (
     <Card style={styles.container}>
-      <Text style={styles.periodTitle}>Summary for {readablePerion}</Text>
+      <Text style={styles.periodTitle}>Summary for {readablePeriod}</Text>
       <Text style={styles.summaryText}>
         Income: {' '}
         <Text style={getMoneyTextStyle(totalIncome)}>
