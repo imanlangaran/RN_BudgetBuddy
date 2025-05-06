@@ -13,7 +13,7 @@ const TransactionsList = ({
   deleteTransaction: (id: number) => Promise<void>;
 }) => {
   return (
-    <View>
+    <View style={{ gap: 15 }}>
       {transactions.map((transaction) => {
         const categoryOfCurrentItem = categories.find(
           (categorie) => categorie.id === transaction.category_id

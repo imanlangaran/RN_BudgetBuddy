@@ -36,7 +36,7 @@ const Home = () => {
   }
 
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={{ padding: 15, paddingVertical: 17 }}>
       <TransactionsList
         categories={catogories}
         transactions={transactions}
