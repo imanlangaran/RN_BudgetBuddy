@@ -1,4 +1,4 @@
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, TextStyle, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Category, Transaction, TransactionsByMonth } from "../types";
 import { useSQLiteContext } from "expo-sqlite";
@@ -35,12 +35,36 @@ const Home = () => {
 
     const now = new Date();
 
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(),1);
-    const endOfMonth = new Date(now.getFullYear(),now.getMonth() + 1, 1);
-    endOfMonth.setMilliseconds(endOfMonth.getMilliseconds()-1);
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    endOfMonth.setMilliseconds(endOfMonth.getMilliseconds() - 1);
 
-    const startOfMonthTimestamp = Math.floor(startOfMonth.getTime()/1000);
-    const endOfMonthTimestamp = Math.floor(endOfMonth.getTime()/1000);
+    const startOfMonthTimestamp = Math.floor(startOfMonth.getTime() / 1000);
+    const endOfMonthTimestamp = Math.floor(endOfMonth.getTime() / 1000);
+
+    const transactionsByMonth = await db.getAllAsync<TransactionsByMonth>(`
+      SELECT ifnull(
+          SUM(
+            CASE
+              WHEN type = 'Expense' THEN amount
+              ELSE 0
+            END
+          ),
+          0
+        ) as totalExpense,
+        ifnull(
+          SUM(
+            CASE
+              WHEN type = 'Income' THEN amount
+              ELSE 0
+            END
+          ),
+          0
+        ) as totalIncome
+      FROM Transactions
+      WHERE date BETWEEN ? AND ?
+      `, [startOfMonthTimestamp, endOfMonthTimestamp]);
+    setTransactionsByMonth(transactionsByMonth[0]);
   }
 
   async function deleteTransaction(id: number) {
@@ -75,11 +99,57 @@ const TransactionSummary = ({
     year: "numeric",
   });
 
+  const getMoneyTextStyle = (value: number): TextStyle => ({
+    fontWeight: 'bold',
+    color: value < 0 ? '#ff4500' : '#2e8b57',
+  });
+
+  const formatMoney = (value: number) => {
+    const absValue = Math.abs(value).toFixed(2);
+    return `${value < 0 ? "-" : ""}$${absValue}`;
+  }
+
   return (
-    <Card>
-      <Text>Summary for {readablePerion}</Text>
+    <Card style={styles.container}>
+      <Text style={styles.periodTitle}>Summary for {readablePerion}</Text>
+      <Text style={styles.summaryText}>
+        Income: {' '}
+        <Text style={getMoneyTextStyle(totalIncome)}>
+          {formatMoney(totalIncome)}
+        </Text>
+      </Text>
+      <Text style={styles.summaryText}>
+        Total Expenses:{' '}
+        <Text style={getMoneyTextStyle(totalExpenses)}>
+          {formatMoney(totalExpenses)}
+        </Text>
+      </Text>
+      <Text style={styles.summaryText}>
+        Saving:{' '}
+        <Text style={getMoneyTextStyle(saving)}>
+          {formatMoney(saving)}
+        </Text>
+      </Text>
     </Card>
   );
 };
 
 export default Home;
+
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: 15,
+    paddingBottom: 7,
+  },
+  periodTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 15,
+  },
+  summaryText: {
+    fontSize: 18,
+    color: '#333',
+    marginBottom: 10,
+  }
+})
