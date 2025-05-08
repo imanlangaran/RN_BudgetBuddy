@@ -4,6 +4,7 @@ import { Category, Transaction, TransactionsByMonth } from "../types";
 import { useSQLiteContext } from "expo-sqlite";
 import TransactionsList from "../components/TransactionsList";
 import Card from "../components/ui/Card";
+import AddTransaction from "../components/AddTransaction";
 
 const Home = () => {
   const [catogories, setCatogories] = useState<Category[]>([]);
@@ -74,8 +75,25 @@ const Home = () => {
     });
   }
 
+  const insertTransaction = async (transaction: Transaction) => {
+    db.withTransactionAsync(async () => {
+      await db.runAsync(
+        `INSERT INTO Transactions (category_id, amount, data, description , type) VALUES (?,?,?,?,?)`,
+        [
+          transaction.category_id,
+          transaction.amount,
+          transaction.date,
+          transaction.description,
+          transaction.type,
+        ]
+      );
+      await getData();
+    })
+  }
+
   return (
     <ScrollView contentContainerStyle={{ padding: 15, paddingVertical: 17 }}>
+      <AddTransaction insertTransaction={insertTransaction} />
       <TransactionSummary
         totalExpenses={transactionsByMonth.totalExpenses}
         totalIncome={transactionsByMonth.totalIncome}
