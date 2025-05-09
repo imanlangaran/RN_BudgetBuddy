@@ -28,6 +28,12 @@
     "plugins": [
       "expo-sqlite",
       "expo-asset"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "3e65d81f-8dee-479e-a104-6854734907cf"
+      }
+    },
+    "owner": "imanlangaran"
   }
 }
