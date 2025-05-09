@@ -88,6 +88,14 @@ const AddTransaction = ({
                 onChange={(event) => {
                   setCurrentTab(event.nativeEvent.selectedSegmentIndex)
                 }}
+                tintColor="#fff" // Set the active segment color
+                // backgroundColor="#FFFFFF" // Set the background color to white
+                fontStyle={{
+                  color: '#000000', // Set the text color to black
+                }}
+                // activeFontStyle={{
+                //   color: '#007AFF', // Set the active text color
+                // }}
               />
               {categories.map((cat) => (
                 <CategoryButton
