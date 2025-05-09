@@ -78,7 +78,7 @@ const Home = () => {
   const insertTransaction = async (transaction: Transaction) => {
     db.withTransactionAsync(async () => {
       await db.runAsync(
-        `INSERT INTO Transactions (category_id, amount, data, description , type) VALUES (?,?,?,?,?)`,
+        `INSERT INTO Transactions (category_id, amount, date, description , type) VALUES (?,?,?,?,?)`,
         [
           transaction.category_id,
           transaction.amount,
