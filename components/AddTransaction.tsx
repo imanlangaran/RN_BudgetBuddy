@@ -1,7 +1,7 @@
-import { Button, TextInput, View, Text, TouchableOpacity } from 'react-native';
+import { Button, TextInput, View, Text, TouchableOpacity, GestureResponderEvent } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'
 import SegmentedControl from '@react-native-segmented-control/segmented-control'
-import React, { useEffect, useState } from 'react'
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Category, Transaction } from '../types'
 import { useSQLiteContext } from 'expo-sqlite';
 import Card from './ui/Card';
@@ -46,7 +46,7 @@ const AddTransaction = ({
       type: category as "Expense" | "Income",
     };
 
-    console.log(theObj);
+    // console.log(theObj);
 
     await insertTransaction(theObj);
 
@@ -84,12 +84,12 @@ const AddTransaction = ({
               <SegmentedControl
                 values={['Expense', 'Income']}
                 style={{ marginBottom: 15 }}
-                selectedIndex={0}
+                selectedIndex={currentTab}
                 onChange={(event) => {
                   setCurrentTab(event.nativeEvent.selectedSegmentIndex)
                 }}
               />
-              {categories.map((cat) => {
+              {categories.map((cat) => (
                 <CategoryButton
                   key={cat.name}
                   id={cat.id}
@@ -98,18 +98,28 @@ const AddTransaction = ({
                   setTypeSelected={setTypeSelected}
                   setCategoryId={setCategoryId}
                 />
-              })}
+              ))}
             </Card>
             <View
               style={{ flexDirection: 'row', justifyContent: 'space-around' }}
             >
-              <Button
+              {/* <Button
                 title='Cancel'
-                color='red'
+                color="red"
                 onPress={() => setIsAddingTransaction(false)}
               />
               <Button
                 title='Save'
+                onPress={handleSave}
+              /> */}
+              <TextButton
+                title='Cancel'
+                color='red'
+                onPress={() => setIsAddingTransaction(false)}
+              />
+              <TextButton
+                title='Save'
+                color='#007AFF'
                 onPress={handleSave}
               />
             </View>
@@ -136,12 +146,12 @@ const CategoryButton = ({
   setCategoryId: Dispatch<SetStateAction<number>>;
 }) => {
   return (
-    <TouachableOpacity
+    <TouchableOpacity
       onPress={() => {
         setTypeSelected(title);
         setCategoryId(id);
       }}
-      activeOpacity={0, 6}
+      activeOpacity={0.6}
       style={{
         height: 40,
         flexDirection: 'row',
@@ -154,14 +164,14 @@ const CategoryButton = ({
     >
       <Text
         style={{
-          fontWeight='700',
+          fontWeight: '700',
           color: isSelected ? '#007bff' : '#000000',
           marginLeft: 5,
         }}
       >
         {title}
       </Text>
-    </TouachableOpacity>
+    </TouchableOpacity>
   )
 }
 
@@ -191,6 +201,38 @@ const AddButton = ({
         marginLeft: 5,
       }}>
         New Entry
+      </Text>
+    </TouchableOpacity>
+  )
+}
+
+const TextButton = (
+  {
+    title,
+    onPress,
+    color
+  }: {
+    title: string;
+    onPress: ((event: GestureResponderEvent) => void) | undefined;
+    color: string;
+  }
+) => {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={{
+        paddingTop: 20,
+        paddingBottom: 10,
+        width: '40%',
+        alignItems: 'center',
+        // backgroundColor:'blue'
+      }}
+    >
+      <Text style={{
+        color: color,
+        fontWeight: '700',
+      }}>
+        {title}
       </Text>
     </TouchableOpacity>
   )
